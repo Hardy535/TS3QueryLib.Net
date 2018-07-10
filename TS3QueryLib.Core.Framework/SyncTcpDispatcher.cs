@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using TS3QueryLib.Core.Common;
@@ -31,9 +31,8 @@ namespace TS3QueryLib.Core
         /// </summary>
         /// <param name="host">The host to connect to</param>
         /// <param name="port">The port to connect to</param>
-        public SyncTcpDispatcher(string host, ushort? port) : base(host?? "localhost", port ?? 11001)
+        public SyncTcpDispatcher(string host, ushort? port) : base(host ?? "localhost", port ?? 11001)
         {
-
         }
 
         #endregion
@@ -48,10 +47,13 @@ namespace TS3QueryLib.Core
         {
             if (SocketAsyncEventArgs != null)
                 return;
-            
+
             Trace.WriteLine("Starting to connect to: " + Host);
 
-            Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp) { ReceiveBufferSize = RECEIVE_BUFFER_SIZE };
+            Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
+            {
+                ReceiveBufferSize = RECEIVE_BUFFER_SIZE
+            };
 
             IPAddress ipV4;
 
@@ -72,10 +74,18 @@ namespace TS3QueryLib.Core
             else
                 RemoteEndPoint = new IPEndPoint(ipV4, Port);
 
-            SocketAsyncEventArgs = new SocketAsyncEventArgs { RemoteEndPoint = RemoteEndPoint, UserToken = new SocketAsyncEventArgsUserToken { Socket = Socket } };
+            SocketAsyncEventArgs = new SocketAsyncEventArgs
+            {
+                RemoteEndPoint = RemoteEndPoint,
+                UserToken = new SocketAsyncEventArgsUserToken {Socket = Socket}
+            };
             ManualResetEvent connectLock = new ManualResetEvent(false);
             SocketError result = SocketError.Success;
-            EventHandler<SocketAsyncEventArgs> connectCallback = (sender, args) => { result = args.SocketError; connectLock.Set(); };
+            EventHandler<SocketAsyncEventArgs> connectCallback = (sender, args) =>
+            {
+                result = args.SocketError;
+                connectLock.Set();
+            };
             Socket.InvokeAsyncMethod(Socket.ConnectAsync, connectCallback, SocketAsyncEventArgs);
             connectLock.WaitOne();
             SocketAsyncEventArgs.Completed -= connectCallback;
@@ -108,7 +118,8 @@ namespace TS3QueryLib.Core
                 if (!queryType.HasValue)
                     continue;
 
-                int requiredGreetingLength = queryType == QueryType.Client ? CLIENT_GREETING.Length : SERVER_GREETING.Length;
+                int requiredGreetingLength =
+                    queryType == QueryType.Client ? CLIENT_GREETING.Length : SERVER_GREETING.Length;
 
                 if (greeting.Length < requiredGreetingLength)
                     continue;
@@ -141,11 +152,12 @@ namespace TS3QueryLib.Core
             greeting = greeting.Substring(CLIENT_GREETING.Length);
 
             const string PATTERN_STATIC_PART = "selected schandlerid=";
-            const string PATTERN = PATTERN_STATIC_PART+@"(?<id>\d+)" + Ts3Util.QUERY_REGEX_LINE_BREAK;
+            const string PATTERN = PATTERN_STATIC_PART + @"(?<id>\d+)" + Ts3Util.QUERY_REGEX_LINE_BREAK;
 
             while (true)
             {
-                if (!PATTERN_STATIC_PART.StartsWith(greeting, StringComparison.InvariantCultureIgnoreCase) && !greeting.StartsWith(PATTERN_STATIC_PART, StringComparison.InvariantCultureIgnoreCase))
+                if (!PATTERN_STATIC_PART.StartsWith(greeting, StringComparison.InvariantCultureIgnoreCase) &&
+                    !greeting.StartsWith(PATTERN_STATIC_PART, StringComparison.InvariantCultureIgnoreCase))
                     return false;
 
                 if (!greeting.Contains(Ts3Util.QUERY_LINE_BREAK))
@@ -155,7 +167,7 @@ namespace TS3QueryLib.Core
                     if (receiveResult.Key != SocketError.Success)
                     {
                         Disconnect();
-                        throw new SocketException((int)receiveResult.Key);
+                        throw new SocketException((int) receiveResult.Key);
                     }
 
                     greeting = string.Concat(greeting, receiveResult.Value);
@@ -199,7 +211,7 @@ namespace TS3QueryLib.Core
 
             Trace.WriteLine("Greeting was wrong! Greeting was: " + greeting);
 
-            throw new SocketException((int)SocketError.ProtocolNotSupported);
+            throw new SocketException((int) SocketError.ProtocolNotSupported);
         }
 
         /// <summary>
@@ -231,7 +243,6 @@ namespace TS3QueryLib.Core
             }
             catch (ObjectDisposedException)
             {
-
             }
 
             return true;
@@ -245,15 +256,22 @@ namespace TS3QueryLib.Core
         {
             lock (_sendMessageLockObject)
             {
-                using (SocketAsyncEventArgs socketAsyncEventArgs = new SocketAsyncEventArgs { RemoteEndPoint = RemoteEndPoint, UserToken = new SocketAsyncEventArgsUserToken { Socket = Socket } })
+                using (SocketAsyncEventArgs socketAsyncEventArgs = new SocketAsyncEventArgs
                 {
-
+                    RemoteEndPoint = RemoteEndPoint,
+                    UserToken = new SocketAsyncEventArgsUserToken {Socket = Socket}
+                })
+                {
                     byte[] messageBytes = Encoding.UTF8.GetBytes(messageToSend);
                     socketAsyncEventArgs.SetBuffer(messageBytes, 0, messageBytes.Length);
 
                     SocketError resultError = SocketError.Success;
                     ManualResetEvent sendLock = new ManualResetEvent(false);
-                    EventHandler<SocketAsyncEventArgs> sendCallback = (sender, args) => { resultError = args.SocketError; sendLock.Set(); };
+                    EventHandler<SocketAsyncEventArgs> sendCallback = (sender, args) =>
+                    {
+                        resultError = args.SocketError;
+                        sendLock.Set();
+                    };
 
                     Socket.InvokeAsyncMethod(Socket.SendAsync, sendCallback, socketAsyncEventArgs);
                     sendLock.WaitOne();
@@ -262,7 +280,7 @@ namespace TS3QueryLib.Core
                     if (resultError != SocketError.Success)
                     {
                         Disconnect();
-                        throw new SocketException((int)resultError);
+                        throw new SocketException((int) resultError);
                     }
 
                     StringBuilder receivedMessage = new StringBuilder();
@@ -272,13 +290,12 @@ namespace TS3QueryLib.Core
                         KeyValuePair<SocketError, string> receiveResult = ReceiveMessage(socketAsyncEventArgs);
                         receivedMessage.Append(receiveResult.Value);
                         resultError = receiveResult.Key;
-                    }
-                    while (resultError == SocketError.Success && !NoMoreReads(receivedMessage.ToString()));
+                    } while (resultError == SocketError.Success && !NoMoreReads(receivedMessage.ToString()));
 
                     if (resultError != SocketError.Success)
                     {
                         Disconnect();
-                        throw new SocketException((int)resultError);
+                        throw new SocketException((int) resultError);
                     }
 
                     return receivedMessage.ToString();
@@ -294,7 +311,7 @@ namespace TS3QueryLib.Core
                 return new KeyValuePair<SocketError, string>(e.SocketError, null);
             }
 
-            SocketAsyncEventArgsUserToken userToken = (SocketAsyncEventArgsUserToken)e.UserToken;
+            SocketAsyncEventArgsUserToken userToken = (SocketAsyncEventArgsUserToken) e.UserToken;
             byte[] sizeBuffer = new byte[RECEIVE_BUFFER_SIZE];
             e.SetBuffer(sizeBuffer, 0, sizeBuffer.Length);
             SocketError resultError = SocketError.Success;
@@ -302,22 +319,22 @@ namespace TS3QueryLib.Core
             ManualResetEvent receiveLock = new ManualResetEvent(false);
             string resultMessage = null;
             EventHandler<SocketAsyncEventArgs> receiveCallback = (sender, args) =>
-                                                                 {
-                                                                     if (args.SocketError != SocketError.Success)
-                                                                     {
-                                                                         resultError = args.SocketError;
-                                                                         receiveLock.Set();
-                                                                         return;
-                                                                     }
+            {
+                if (args.SocketError != SocketError.Success)
+                {
+                    resultError = args.SocketError;
+                    receiveLock.Set();
+                    return;
+                }
 
-                                                                     byte[] buffer = new byte[e.BytesTransferred];
-                                                                     Array.Copy(e.Buffer, e.Offset, buffer, 0, e.BytesTransferred);
-                                                                     resultMessage = Encoding.UTF8.GetString(e.Buffer, e.Offset, e.BytesTransferred);
-                                                                     receiveLock.Set();
+                byte[] buffer = new byte[e.BytesTransferred];
+                Array.Copy(e.Buffer, e.Offset, buffer, 0, e.BytesTransferred);
+                resultMessage = Encoding.UTF8.GetString(e.Buffer, e.Offset, e.BytesTransferred);
+                receiveLock.Set();
 
-                                                                     if (resultMessage.Length == 0)
-                                                                         Disconnect();
-                                                                 };
+                if (resultMessage.Length == 0)
+                    Disconnect();
+            };
 
             userToken.Socket.InvokeAsyncMethod(userToken.Socket.ReceiveAsync, receiveCallback, e);
             receiveLock.WaitOne();
