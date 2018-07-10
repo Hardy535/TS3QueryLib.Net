@@ -67,14 +67,15 @@ namespace TS3QueryLib.Core
         /// <param name="port">The port to connect to</param>
         /// <param name="keepAliveInterval">The keep alive interval used to send heart beats in a specific interval to the server to not get timed out (disconnected)</param>
         /// <param name="synchronizationContext">The synchronization context on which to raise events.</param>
-        public AwaitableQueryDispatcher(string host = null, ushort? port = null, TimeSpan? keepAliveInterval = null, SynchronizationContext synchronizationContext = null)
+        public AwaitableQueryDispatcher(string host = null, ushort? port = null, TimeSpan? keepAliveInterval = null,
+            SynchronizationContext synchronizationContext = null)
         {
             Host = host ?? "localhost";
             Port = port ?? 10011;
             KeepAliveInterval = keepAliveInterval;
             SyncContext = synchronizationContext ?? SynchronizationContext.Current;
         }
-        
+
         #endregion
 
         #region Public Methods
@@ -99,7 +100,7 @@ namespace TS3QueryLib.Core
             AtLeastOneResponseReceived = false;
             ClientStream = Client.GetStream();
             ClientReader = new StreamReader(ClientStream);
-            ClientWriter = new StreamWriter(ClientStream) { NewLine = "\n" };
+            ClientWriter = new StreamWriter(ClientStream) {NewLine = "\n"};
 
             string message = await ReadLineAsync().ConfigureAwait(false);
 
@@ -214,7 +215,7 @@ namespace TS3QueryLib.Core
                         ReceivedLines.Clear();
                     }
 
-                    string responseText = string.Join("\n\r", ReceivedLines.Concat(new[] { message }));
+                    string responseText = string.Join("\n\r", ReceivedLines.Concat(new[] {message}));
                     MessageResponses.Enqueue(responseText);
                     ReceivedLines.Clear();
 
@@ -237,7 +238,9 @@ namespace TS3QueryLib.Core
                     {
                         const string LastServerConnectionHandlerIdText = "selected schandlerid=";
 
-                        if (message.StartsWith(LastServerConnectionHandlerIdText, StringComparison.InvariantCultureIgnoreCase) && int.TryParse(message.Substring(LastServerConnectionHandlerIdText.Length).Trim(), out int handlerId))
+                        if (message.StartsWith(LastServerConnectionHandlerIdText,
+                                StringComparison.InvariantCultureIgnoreCase) && int.TryParse(
+                                message.Substring(LastServerConnectionHandlerIdText.Length).Trim(), out int handlerId))
                             LastServerConnectionHandlerId = handlerId;
                     }
 
@@ -265,7 +268,9 @@ namespace TS3QueryLib.Core
         protected void OnNotificationReceived(object notificationText)
         {
             if (NotificationReceived != null)
-                SyncContext.PostEx(p => NotificationReceived(((object[])p)[0], new EventArgs<string>(Convert.ToString(((object[])p)[1]))), new[] { this, notificationText });
+                SyncContext.PostEx(
+                    p => NotificationReceived(((object[]) p)[0],
+                        new EventArgs<string>(Convert.ToString(((object[]) p)[1]))), new[] {this, notificationText});
         }
 
         private void DisconnectForced(string reason = null)
@@ -300,11 +305,11 @@ namespace TS3QueryLib.Core
 
             IsDisposed = true;
         }
-        
+
         #endregion
 
         #region Embedded Types
-        
+
         public class ConnectResponse
         {
             public string Greeting { get; }
@@ -313,7 +318,8 @@ namespace TS3QueryLib.Core
             public bool Success { get; }
             public string Message { get; set; }
 
-            public ConnectResponse(string greeting = null, QueryType? queryType = null, bool success = false, string message = null)
+            public ConnectResponse(string greeting = null, QueryType? queryType = null, bool success = false,
+                string message = null)
             {
                 Greeting = greeting;
                 QueryType = queryType;
