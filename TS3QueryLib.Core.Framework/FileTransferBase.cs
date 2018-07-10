@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Linq;
 
 namespace TS3QueryLib.Core
 {
@@ -29,7 +29,8 @@ namespace TS3QueryLib.Core
                 throw new ArgumentNullException();
 
             if (fileTransferKey.Length != 32)
-                throw new ArgumentOutOfRangeException("fileTransferKey", "fileTransferKey must have a length of 32 characters");
+                throw new ArgumentOutOfRangeException("fileTransferKey",
+                    "fileTransferKey must have a length of 32 characters");
 
             if (host == null)
                 throw new ArgumentNullException("host");
