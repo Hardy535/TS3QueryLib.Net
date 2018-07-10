@@ -23,50 +23,41 @@ namespace TS3QueryLib.Core
 
         protected const string CLIENT_GREETING_FIRST_LINE = "TS3 Client" + Ts3Util.QUERY_LINE_BREAK;
         protected const string SERVER_GREETING_FIRST_LINE = "TS3" + Ts3Util.QUERY_LINE_BREAK;
-        protected const string SERVER_GREETING = SERVER_GREETING_FIRST_LINE + "Welcome to the TeamSpeak 3 ServerQuery interface, type \"help\" for a list of commands and \"help <command>\" for information on a specific command." + Ts3Util.QUERY_LINE_BREAK;
-        protected const string CLIENT_GREETING = CLIENT_GREETING_FIRST_LINE + "Welcome to the TeamSpeak 3 ClientQuery interface, type \"help\" for a list of commands and \"help <command>\" for information on a specific command." + Ts3Util.QUERY_LINE_BREAK;
+
+        protected const string SERVER_GREETING = SERVER_GREETING_FIRST_LINE +
+                                                 "Welcome to the TeamSpeak 3 ServerQuery interface, type \"help\" for a list of commands and \"help <command>\" for information on a specific command." +
+                                                 Ts3Util.QUERY_LINE_BREAK;
+
+        protected const string CLIENT_GREETING = CLIENT_GREETING_FIRST_LINE +
+                                                 "Welcome to the TeamSpeak 3 ClientQuery interface, type \"help\" for a list of commands and \"help <command>\" for information on a specific command." +
+                                                 Ts3Util.QUERY_LINE_BREAK;
+
         protected const int RECEIVE_BUFFER_SIZE = 4 * 1024;
 
         #endregion
 
         #region Properties
 
-        public string Host
-        {
-            get;
-            protected set;
-        }
+        public string Host { get; protected set; }
 
-        public int Port
-        {
-            get;
-            protected set;
-        }
+        public int Port { get; protected set; }
 
         public bool IsConnected
         {
             get { return SocketAsyncEventArgs != null; }
         }
 
-        public SocketAsyncEventArgs SocketAsyncEventArgs
+        public SocketAsyncEventArgs SocketAsyncEventArgs { get; protected set; }
+
+        public Socket Socket { get; protected set; }
+
+        public EndPoint RemoteEndPoint { get; protected set; }
+
+        public bool IsDisposed
         {
-            get;
-            protected set;
+            get { return _disposed; }
         }
 
-        public Socket Socket
-        {
-            get;
-            protected set;
-        }
-
-        public EndPoint RemoteEndPoint
-        {
-            get;
-            protected set;
-        }
-
-        public bool IsDisposed { get { return _disposed; } }
         public int? LastServerConnectionHandlerId { get; protected set; }
 
         protected SynchronizationContext SyncContext { get; private set; }
@@ -94,7 +85,6 @@ namespace TS3QueryLib.Core
         /// </summary>
         protected TcpDispatcherBase() : this(null, null)
         {
-
         }
 
         /// <summary>
@@ -164,7 +154,8 @@ namespace TS3QueryLib.Core
 
         protected static bool ContainsStatusLine(string responseText)
         {
-            const string pattern = @"((^)|(" + Ts3Util.QUERY_REGEX_LINE_BREAK + "))error id=.+?" + Ts3Util.QUERY_REGEX_LINE_BREAK;
+            const string pattern = @"((^)|(" + Ts3Util.QUERY_REGEX_LINE_BREAK + "))error id=.+?" +
+                                   Ts3Util.QUERY_REGEX_LINE_BREAK;
 
             return Regex.IsMatch(responseText, pattern, RegexOptions.Singleline);
         }
@@ -172,13 +163,17 @@ namespace TS3QueryLib.Core
         protected void OnNotificationReceived(object notificationText)
         {
             if (NotificationReceived != null)
-                SyncContext.PostEx(p => NotificationReceived(((object[])p)[0], new EventArgs<string>(Convert.ToString(((object[])p)[1]))), new[] { this, notificationText });
+                SyncContext.PostEx(
+                    p => NotificationReceived(((object[]) p)[0],
+                        new EventArgs<string>(Convert.ToString(((object[]) p)[1]))), new[] {this, notificationText});
         }
 
         protected void OnBanDetected(object banResponse)
         {
             if (BanDetected != null)
-                SyncContext.PostEx(p => BanDetected(((object[])p)[0], new EventArgs<SimpleResponse>((SimpleResponse)((object[])p)[1])), new [] { this, banResponse });
+                SyncContext.PostEx(
+                    p => BanDetected(((object[]) p)[0],
+                        new EventArgs<SimpleResponse>((SimpleResponse) ((object[]) p)[1])), new[] {this, banResponse});
         }
 
         #endregion
@@ -213,7 +208,6 @@ namespace TS3QueryLib.Core
 
         protected virtual void DisposeInternal()
         {
-
         }
 
         protected virtual void Dispose(bool disposing)
