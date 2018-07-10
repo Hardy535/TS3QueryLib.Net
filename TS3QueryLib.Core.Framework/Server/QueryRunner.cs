@@ -17,11 +17,11 @@ namespace TS3QueryLib.Core.Server
     {
         #region Properties
 
-
         /// <summary>
         /// Provides access to events raised by notifications
         /// </summary>
         public Notifications Notifications { get; protected set; }
+
         /// <summary>
         /// Provides utility methods that are using the queryrunner methods under the hood to ease some often used functions.
         /// </summary>
@@ -188,12 +188,14 @@ namespace TS3QueryLib.Core.Server
             return GetServerList(includeRemoteServers, includeUniqueId, false);
         }
 
-        public ListResponse<ServerListItem> GetServerList(bool includeRemoteServers, bool includeUniqueId, bool onlyOfflineServers)
+        public ListResponse<ServerListItem> GetServerList(bool includeRemoteServers, bool includeUniqueId,
+            bool onlyOfflineServers)
         {
             return GetServerList(false, includeRemoteServers, includeUniqueId, onlyOfflineServers);
         }
 
-        private ListResponse<ServerListItem> GetServerList(bool includeAll, bool includeRemoteServers, bool includeUniqueId, bool onlyOfflineServers)
+        private ListResponse<ServerListItem> GetServerList(bool includeAll, bool includeRemoteServers,
+            bool includeUniqueId, bool onlyOfflineServers)
         {
             Command command = CommandName.ServerList.CreateCommand();
 
@@ -302,7 +304,8 @@ namespace TS3QueryLib.Core.Server
         /// </summary>
         public ConnectionInfoResponse GetServerConnectionInfo()
         {
-            return ResponseBase<ConnectionInfoResponse>.Parse(SendCommand(CommandName.ServerRequestConnectionInfo.CreateCommand()));
+            return ResponseBase<ConnectionInfoResponse>.Parse(
+                SendCommand(CommandName.ServerRequestConnectionInfo.CreateCommand()));
         }
 
         /// <summary>
@@ -325,7 +328,8 @@ namespace TS3QueryLib.Core.Server
         /// </summary>
         public ListResponse<ServerGroup> GetServerGroupList()
         {
-            return ListResponse<ServerGroup>.Parse(SendCommand(CommandName.ServerGroupList.CreateCommand()), ServerGroup.Parse);
+            return ListResponse<ServerGroup>.Parse(SendCommand(CommandName.ServerGroupList.CreateCommand()),
+                ServerGroup.Parse);
         }
 
         /// <summary>
@@ -344,7 +348,7 @@ namespace TS3QueryLib.Core.Server
         /// <param name="groupType">Type of the new group to create</param>
         public SingleValueResponse<uint?> AddServerGroup(string serverGroupName, GroupDatabaseType groupType)
         {
-            return AddServerGroup(serverGroupName, (GroupDatabaseType?)groupType);
+            return AddServerGroup(serverGroupName, (GroupDatabaseType?) groupType);
         }
 
         private SingleValueResponse<uint?> AddServerGroup(string serverGroupName, GroupDatabaseType? groupType)
@@ -356,11 +360,10 @@ namespace TS3QueryLib.Core.Server
             command.AddParameter("name", serverGroupName);
 
             if (groupType.HasValue)
-                command.AddParameter("type", (int)groupType);
+                command.AddParameter("type", (int) groupType);
 
             return ResponseBase<SingleValueResponse<uint?>>.Parse(SendCommand(command), "sgid");
         }
-
 
 
         public SimpleResponse DeleteServerGroup(uint serverGroupId)
@@ -443,7 +446,7 @@ namespace TS3QueryLib.Core.Server
         /// <param name="continueOnError">if set to <c>true</c> continue on error.</param>
         public SimpleResponse AddServerGroupPermission(uint serverGroupId, Permission permission, bool continueOnError)
         {
-            return AddServerGroupPermission(serverGroupId, new[] { permission }, continueOnError);
+            return AddServerGroupPermission(serverGroupId, new[] {permission}, continueOnError);
         }
 
         /// <summary>
@@ -463,7 +466,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="permissions">the permissions to add</param>
         /// <param name="continueOnError">if set to <c>true</c> continue on error.</param>
         /// <returns></returns>
-        public SimpleResponse AddServerGroupPermission(uint serverGroupId, IEnumerable<Permission> permissions, bool continueOnError)
+        public SimpleResponse AddServerGroupPermission(uint serverGroupId, IEnumerable<Permission> permissions,
+            bool continueOnError)
         {
             if (permissions == null)
                 throw new ArgumentNullException("permissions");
@@ -505,9 +509,10 @@ namespace TS3QueryLib.Core.Server
         /// </summary>
         /// <param name="serverGroupId">the id of the server group</param>
         /// <param name="permission">the permission to add</param>
-        public SimpleResponse AddServerGroupPermission(uint serverGroupId, NamedPermission permission, bool continueOnError)
+        public SimpleResponse AddServerGroupPermission(uint serverGroupId, NamedPermission permission,
+            bool continueOnError)
         {
-            return AddServerGroupPermission(serverGroupId, new[] { permission }, continueOnError);
+            return AddServerGroupPermission(serverGroupId, new[] {permission}, continueOnError);
         }
 
         /// <summary>
@@ -526,7 +531,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="serverGroupId">the id of the server group</param>
         /// <param name="permissions">the permissions to add</param>
         /// <param name="continueOnError">if set to <c>true</c> continue on error.</param>
-        public SimpleResponse AddServerGroupPermission(uint serverGroupId, IEnumerable<NamedPermission> permissions, bool continueOnError)
+        public SimpleResponse AddServerGroupPermission(uint serverGroupId, IEnumerable<NamedPermission> permissions,
+            bool continueOnError)
         {
             if (permissions == null)
                 throw new ArgumentNullException("permissions");
@@ -558,7 +564,8 @@ namespace TS3QueryLib.Core.Server
         /// </summary>
         /// <param name="serverGroupType">the type of server group</param>
         /// <param name="permissions">the permissions to add</param>
-        public SimpleResponse AddServerGroupAutoPermission(ServerGroupType serverGroupType, IEnumerable<Permission> permissions)
+        public SimpleResponse AddServerGroupAutoPermission(ServerGroupType serverGroupType,
+            IEnumerable<Permission> permissions)
         {
             if (permissions == null)
                 throw new ArgumentNullException(nameof(permissions));
@@ -567,7 +574,7 @@ namespace TS3QueryLib.Core.Server
                 throw new ArgumentException("permissions are empty.");
 
             Command command = CommandName.ServerGroupAutoAddPerm.CreateCommand();
-            command.AddParameter("sgtype", (uint)serverGroupType);
+            command.AddParameter("sgtype", (uint) serverGroupType);
 
             uint index = 0;
             foreach (Permission permission in permissions)
@@ -589,7 +596,7 @@ namespace TS3QueryLib.Core.Server
         /// <param name="permissionId">The id of the permission to remove</param>
         public SimpleResponse DeleteServerGroupAutoPermission(ServerGroupType serverGroupType, uint permissionId)
         {
-            return DeleteServerGroupAutoPermissions(serverGroupType, new [] {permissionId});
+            return DeleteServerGroupAutoPermissions(serverGroupType, new[] {permissionId});
         }
 
         /// <summary>
@@ -597,7 +604,8 @@ namespace TS3QueryLib.Core.Server
         /// </summary>
         /// <param name="serverGroupType">The server group type</param>
         /// <param name="permissionIdList">The ids of the permissions to remove</param>
-        public SimpleResponse DeleteServerGroupAutoPermissions(ServerGroupType serverGroupType, IEnumerable<uint> permissionIdList)
+        public SimpleResponse DeleteServerGroupAutoPermissions(ServerGroupType serverGroupType,
+            IEnumerable<uint> permissionIdList)
         {
             if (permissionIdList == null)
                 throw new ArgumentNullException(nameof(permissionIdList));
@@ -606,7 +614,7 @@ namespace TS3QueryLib.Core.Server
                 throw new ArgumentException("permissions are empty.");
 
             Command command = CommandName.ServerGroupAutoDelPerm.CreateCommand();
-            command.AddParameter("sgtype", (uint)serverGroupType);
+            command.AddParameter("sgtype", (uint) serverGroupType);
 
             uint index = 0;
             foreach (uint permissionId in permissionIdList)
@@ -625,7 +633,7 @@ namespace TS3QueryLib.Core.Server
         /// <param name="permissionName">The name of the permission to remove</param>
         public SimpleResponse DeleteServerGroupAutoPermission(ServerGroupType serverGroupType, string permissionName)
         {
-            return DeleteServerGroupAutoPermissions(serverGroupType, new[] { permissionName });
+            return DeleteServerGroupAutoPermissions(serverGroupType, new[] {permissionName});
         }
 
         /// <summary>
@@ -633,7 +641,8 @@ namespace TS3QueryLib.Core.Server
         /// </summary>
         /// <param name="serverGroupType">The server group type</param>
         /// <param name="permissionNameList">The names of the permissions to remove</param>
-        public SimpleResponse DeleteServerGroupAutoPermissions(ServerGroupType serverGroupType, IEnumerable<string> permissionNameList)
+        public SimpleResponse DeleteServerGroupAutoPermissions(ServerGroupType serverGroupType,
+            IEnumerable<string> permissionNameList)
         {
             if (permissionNameList == null)
                 throw new ArgumentNullException(nameof(permissionNameList));
@@ -642,7 +651,7 @@ namespace TS3QueryLib.Core.Server
                 throw new ArgumentException("permissions are empty.");
 
             Command command = CommandName.ServerGroupAutoDelPerm.CreateCommand();
-            command.AddParameter("sgtype", (uint)serverGroupType);
+            command.AddParameter("sgtype", (uint) serverGroupType);
 
             uint index = 0;
             foreach (string permissionName in permissionNameList)
@@ -698,7 +707,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="serverGroupId">The id of the group to delete the permissions from</param>
         /// <param name="permissionIdList">The ids of the permissions to remove</param>
         /// <param name="continueOnError">if set to <c>true</c> continue on error.</param>
-        public SimpleResponse DeleteServerGroupPermissions(uint serverGroupId, IEnumerable<uint> permissionIdList, bool continueOnError)
+        public SimpleResponse DeleteServerGroupPermissions(uint serverGroupId, IEnumerable<uint> permissionIdList,
+            bool continueOnError)
         {
             if (permissionIdList == null)
                 throw new ArgumentNullException("permissionIdList");
@@ -738,7 +748,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="serverGroupId">The id of the group to delete the permission from</param>
         /// <param name="permissionName">The name of the permission to remove</param>
         /// <param name="continueOnError">if set to <c>true</c> continue on error.</param>
-        public SimpleResponse DeleteServerGroupPermission(uint serverGroupId, string permissionName, bool continueOnError)
+        public SimpleResponse DeleteServerGroupPermission(uint serverGroupId, string permissionName,
+            bool continueOnError)
         {
             Command command = CommandName.ServerGroupDelPerm.CreateCommand();
             command.AddParameter("sgid", serverGroupId);
@@ -766,7 +777,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="serverGroupId">The id of the group to delete the permissions from</param>
         /// <param name="permissionNameList">The names of the permissions to remove</param>
         /// <param name="continueOnError">if set to <c>true</c> continue on error.</param>
-        public SimpleResponse DeleteServerGroupPermissions(uint serverGroupId, IEnumerable<string> permissionNameList, bool continueOnError)
+        public SimpleResponse DeleteServerGroupPermissions(uint serverGroupId, IEnumerable<string> permissionNameList,
+            bool continueOnError)
         {
             if (permissionNameList == null)
                 throw new ArgumentNullException("permissionNameList");
@@ -967,7 +979,7 @@ namespace TS3QueryLib.Core.Server
         /// <param name="beginPos">Must be 0 or the last_pos value of the previous log query response.</param>
         /// <param name="reverse">Reverse start? (Not documented by TS)</param>
         /// <param name="instance">If set to true, the server will return lines from the master logfile (ts3server_0.log) instead of the selected virtual server logfile.</param>
-        public ListResponse<LogEntry> GetLogEntries(ushort lines,uint beginPos,Boolean reverse,Boolean instance)
+        public ListResponse<LogEntry> GetLogEntries(ushort lines, uint beginPos, Boolean reverse, Boolean instance)
         {
             lines = Math.Max(Math.Min(lines, (ushort) 100), (ushort) 1);
 
@@ -991,7 +1003,7 @@ namespace TS3QueryLib.Core.Server
                 throw new ArgumentNullException("logEntry");
 
             Command command = CommandName.LogAdd.CreateCommand();
-            command.AddParameter("loglevel", (uint)logEntry.LogLevel);
+            command.AddParameter("loglevel", (uint) logEntry.LogLevel);
             command.AddParameter("logmsg", logEntry.Message);
 
             return ResponseBase<SimpleResponse>.Parse(SendCommand(command));
@@ -1027,12 +1039,14 @@ namespace TS3QueryLib.Core.Server
         /// <param name="includeVoiceInfo">if set to true voice parameters are included</param>
         /// <param name="includeLimits">if set to true limit parameters are included</param>
         /// <param name="includeIcon">if set to true icon parameter is included</param>
-        public ListResponse<ChannelListEntry> GetChannelList(bool includeTopics, bool includeFlags, bool includeVoiceInfo, bool includeLimits, bool includeIcon)
+        public ListResponse<ChannelListEntry> GetChannelList(bool includeTopics, bool includeFlags,
+            bool includeVoiceInfo, bool includeLimits, bool includeIcon)
         {
             return GetChannelList(false, includeTopics, includeFlags, includeVoiceInfo, includeLimits, includeIcon);
         }
 
-        private ListResponse<ChannelListEntry> GetChannelList(bool includeAll, bool includeTopics, bool includeFlags, bool includeVoiceInfo, bool includeLimits, bool includeIcon)
+        private ListResponse<ChannelListEntry> GetChannelList(bool includeAll, bool includeTopics, bool includeFlags,
+            bool includeVoiceInfo, bool includeLimits, bool includeIcon)
         {
             Command command = CommandName.ChannelList.CreateCommand();
 
@@ -1053,7 +1067,6 @@ namespace TS3QueryLib.Core.Server
 
             return ListResponse<ChannelListEntry>.Parse(SendCommand(command), ChannelListEntry.Parse);
         }
-
 
 
         /// <summary>
@@ -1192,7 +1205,7 @@ namespace TS3QueryLib.Core.Server
         /// <param name="permission">the permission to add</param>
         public SimpleResponse AddChannelPermission(uint channelId, PermissionLight permission)
         {
-            return AddChannelPermissions(channelId, new[] { permission });
+            return AddChannelPermissions(channelId, new[] {permission});
         }
 
         /// <summary>
@@ -1229,7 +1242,7 @@ namespace TS3QueryLib.Core.Server
         /// <param name="permission">the permission to add</param>
         public SimpleResponse AddChannelPermission(uint channelId, NamedPermissionLight permission)
         {
-            return AddChannelPermissions(channelId, new[] { permission });
+            return AddChannelPermissions(channelId, new[] {permission});
         }
 
         /// <summary>
@@ -1344,7 +1357,8 @@ namespace TS3QueryLib.Core.Server
         /// </summary>
         public ListResponse<ChannelGroup> GetChannelGroupList()
         {
-            return ListResponse<ChannelGroup>.Parse(SendCommand(CommandName.ChannelGroupList.CreateCommand()), ChannelGroup.Parse);
+            return ListResponse<ChannelGroup>.Parse(SendCommand(CommandName.ChannelGroupList.CreateCommand()),
+                ChannelGroup.Parse);
         }
 
         /// <summary>
@@ -1423,7 +1437,7 @@ namespace TS3QueryLib.Core.Server
         /// <param name="permission">the permission to add</param>
         public SimpleResponse AddChannelGroupPermission(uint channelGroupId, PermissionLight permission)
         {
-            return AddChannelGroupPermissions(channelGroupId, new[] { permission });
+            return AddChannelGroupPermissions(channelGroupId, new[] {permission});
         }
 
         /// <summary>
@@ -1442,7 +1456,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelGroupId">the id of the channel group</param>
         /// <param name="permissions">the permissions to add</param>
         /// <param name="continueOnError">if set to <c>true</c> continue on error.</param>
-        public SimpleResponse AddChannelGroupPermissions(uint channelGroupId, IEnumerable<PermissionLight> permissions, bool continueOnError)
+        public SimpleResponse AddChannelGroupPermissions(uint channelGroupId, IEnumerable<PermissionLight> permissions,
+            bool continueOnError)
         {
             if (permissions == null)
                 throw new ArgumentNullException("permissions");
@@ -1474,7 +1489,7 @@ namespace TS3QueryLib.Core.Server
         /// <param name="permission">the permission to add</param>
         public SimpleResponse AddChannelGroupPermission(uint channelGroupId, NamedPermissionLight permission)
         {
-            return AddChannelGroupPermissions(channelGroupId, new[] { permission });
+            return AddChannelGroupPermissions(channelGroupId, new[] {permission});
         }
 
         /// <summary>
@@ -1482,7 +1497,8 @@ namespace TS3QueryLib.Core.Server
         /// </summary>
         /// <param name="channelGroupId">the id of the channel group</param>
         /// <param name="permissions">the permissions to add</param>
-        public SimpleResponse AddChannelGroupPermissions(uint channelGroupId, IEnumerable<NamedPermissionLight> permissions)
+        public SimpleResponse AddChannelGroupPermissions(uint channelGroupId,
+            IEnumerable<NamedPermissionLight> permissions)
         {
             if (permissions == null)
                 throw new ArgumentNullException("permissions");
@@ -1574,7 +1590,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelGroupId">The id of the channel group to delete the permission from</param>
         /// <param name="permissionName">The name of the permission to remove</param>
         /// <param name="continueOnError">if set to <c>true</c> continue on error.</param>
-        public SimpleResponse DeleteChannelGroupPermission(uint channelGroupId, string permissionName, bool continueOnError)
+        public SimpleResponse DeleteChannelGroupPermission(uint channelGroupId, string permissionName,
+            bool continueOnError)
         {
             Command command = CommandName.ChannelGroupDelPerm.CreateCommand();
             command.AddParameter("cgid", channelGroupId);
@@ -1602,7 +1619,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelGroupId">The id of the channel group to delete the permissions from</param>
         /// <param name="permissionNameList">The names of the permissions to remove</param>
         /// <param name="continueOnError">if set to <c>true</c> continue on error.</param>
-        public SimpleResponse DeleteChannelGroupPermissions(uint channelGroupId, IEnumerable<string> permissionNameList, bool continueOnError)
+        public SimpleResponse DeleteChannelGroupPermissions(uint channelGroupId, IEnumerable<string> permissionNameList,
+            bool continueOnError)
         {
             if (permissionNameList == null)
                 throw new ArgumentNullException("permissionNameList");
@@ -1663,7 +1681,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelId">The channel id</param>
         /// <param name="clientDatabaseId">The client database id</param>
         /// <param name="channelGroupId">The channel group id</param>
-        public ListResponse<ChannelGroupClient> GetChannelGroupClientList(uint? channelId, uint? clientDatabaseId, uint? channelGroupId)
+        public ListResponse<ChannelGroupClient> GetChannelGroupClientList(uint? channelId, uint? clientDatabaseId,
+            uint? channelGroupId)
         {
             Command command = CommandName.ChannelGroupClientList.CreateCommand();
 
@@ -1719,12 +1738,17 @@ namespace TS3QueryLib.Core.Server
         /// <param name="includeIcon">if set to true, icon information is included</param>
         /// <param name="includeCountry">if set to true, country information is included</param>
         /// <param name="includeIPs">if set to true, ip information is included</param>
-        public ListResponse<ClientListEntry> GetClientList(bool includeUniqueId, bool includeAwayState, bool includeVoiceInfo, bool includeGroupInfo, bool includeClientInfo, bool includeTimes, bool includeIcon, bool includeCountry, bool includeIPs)
+        public ListResponse<ClientListEntry> GetClientList(bool includeUniqueId, bool includeAwayState,
+            bool includeVoiceInfo, bool includeGroupInfo, bool includeClientInfo, bool includeTimes, bool includeIcon,
+            bool includeCountry, bool includeIPs)
         {
-            return GetClientList(false, includeUniqueId, includeAwayState, includeVoiceInfo, includeGroupInfo, includeClientInfo, includeTimes, includeIcon, includeCountry, includeIPs);
+            return GetClientList(false, includeUniqueId, includeAwayState, includeVoiceInfo, includeGroupInfo,
+                includeClientInfo, includeTimes, includeIcon, includeCountry, includeIPs);
         }
 
-        private ListResponse<ClientListEntry> GetClientList(bool includeAll, bool includeUniqueId, bool includeAwayState, bool includeVoiceInfo, bool includeGroupInfo, bool includeClientInfo, bool includeTimes, bool includeIcon, bool includeCountry, bool includeIPs)
+        private ListResponse<ClientListEntry> GetClientList(bool includeAll, bool includeUniqueId,
+            bool includeAwayState, bool includeVoiceInfo, bool includeGroupInfo, bool includeClientInfo,
+            bool includeTimes, bool includeIcon, bool includeCountry, bool includeIPs)
         {
             Command command = CommandName.ClientList.CreateCommand();
 
@@ -1836,7 +1860,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="startIndex">the index of the first record to return (starting  at 0). Default is 0.</param>
         /// <param name="numberOfRecords">The amount of records to return. Default is 25</param>
         /// <param name="includeTotalCount">If set to true, the property TotalClientsInDatabase of the response is filled with the whole amount of records in database.</param>
-        public ClientDbEntryListResponse GetClientDatabaseList(uint? startIndex, uint? numberOfRecords, bool includeTotalCount)
+        public ClientDbEntryListResponse GetClientDatabaseList(uint? startIndex, uint? numberOfRecords,
+            bool includeTotalCount)
         {
             Command command = CommandName.ClientDbList.CreateCommand();
 
@@ -2152,7 +2177,7 @@ namespace TS3QueryLib.Core.Server
         /// <param name="permission">the permission to add</param>
         public SimpleResponse AddClientPermission(uint clientDatabaseId, ClientPermission permission)
         {
-            return AddClientPermissions(clientDatabaseId, new[] { permission });
+            return AddClientPermissions(clientDatabaseId, new[] {permission});
         }
 
         /// <summary>
@@ -2190,7 +2215,7 @@ namespace TS3QueryLib.Core.Server
         /// <param name="permission">the permission to add</param>
         public SimpleResponse AddClientPermission(uint clientDatabaseId, NamedClientPermission permission)
         {
-            return AddClientPermissions(clientDatabaseId, new[] { permission });
+            return AddClientPermissions(clientDatabaseId, new[] {permission});
         }
 
         /// <summary>
@@ -2198,7 +2223,8 @@ namespace TS3QueryLib.Core.Server
         /// </summary>
         /// <param name="clientDatabaseId">the database id of the client</param>
         /// <param name="permissions">the permissions to add</param>
-        public SimpleResponse AddClientPermissions(uint clientDatabaseId, IEnumerable<NamedClientPermission> permissions)
+        public SimpleResponse AddClientPermissions(uint clientDatabaseId,
+            IEnumerable<NamedClientPermission> permissions)
         {
             if (permissions == null)
                 throw new ArgumentNullException("permissions");
@@ -2321,7 +2347,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelId">the id of the channel></param>
         /// <param name="clientDatabaseId">the clients database id</param>
         /// <param name="returnNameInsteadOfId">If set to true, the returned permissions have the Id property set to 0 and the name property will be filled with the permission name</param>
-        public ListResponse<Permission> GetChannelClientPermissionList(uint channelId, uint clientDatabaseId, bool returnNameInsteadOfId)
+        public ListResponse<Permission> GetChannelClientPermissionList(uint channelId, uint clientDatabaseId,
+            bool returnNameInsteadOfId)
         {
             Command command = CommandName.ChannelClientPermList.CreateCommand();
             command.AddParameter("cid", channelId);
@@ -2339,9 +2366,10 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelId">the id of the channel</param>
         /// <param name="clientDatabaseId">the database id of the client</param>
         /// <param name="permission">the permission to add</param>
-        public SimpleResponse AddChannelClientPermission(uint channelId, uint clientDatabaseId, PermissionLight permission)
+        public SimpleResponse AddChannelClientPermission(uint channelId, uint clientDatabaseId,
+            PermissionLight permission)
         {
-            return AddChannelClientPermissions(channelId,clientDatabaseId, new[] { permission });
+            return AddChannelClientPermissions(channelId, clientDatabaseId, new[] {permission});
         }
 
         /// <summary>
@@ -2350,7 +2378,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelId">the id of the channel</param>
         /// <param name="clientDatabaseId">the database id of the client</param>
         /// <param name="permissions">the permissions to add</param>
-        public SimpleResponse AddChannelClientPermissions(uint channelId, uint clientDatabaseId, IEnumerable<PermissionLight> permissions)
+        public SimpleResponse AddChannelClientPermissions(uint channelId, uint clientDatabaseId,
+            IEnumerable<PermissionLight> permissions)
         {
             if (permissions == null)
                 throw new ArgumentNullException("permissions");
@@ -2379,9 +2408,10 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelId">the id of the channel</param>
         /// <param name="clientDatabaseId">the database id of the client</param>
         /// <param name="permission">the permission to add</param>
-        public SimpleResponse AddChannelClientPermission(uint channelId, uint clientDatabaseId, NamedPermissionLight permission)
+        public SimpleResponse AddChannelClientPermission(uint channelId, uint clientDatabaseId,
+            NamedPermissionLight permission)
         {
-            return AddChannelClientPermissions(channelId, clientDatabaseId, new[] { permission });
+            return AddChannelClientPermissions(channelId, clientDatabaseId, new[] {permission});
         }
 
         /// <summary>
@@ -2390,7 +2420,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelId">the id of the channel</param>
         /// <param name="clientDatabaseId">the database id of the client</param>
         /// <param name="permissions">the permissions to add</param>
-        public SimpleResponse AddChannelClientPermissions(uint channelId, uint clientDatabaseId, IEnumerable<NamedPermissionLight> permissions)
+        public SimpleResponse AddChannelClientPermissions(uint channelId, uint clientDatabaseId,
+            IEnumerable<NamedPermissionLight> permissions)
         {
             if (permissions == null)
                 throw new ArgumentNullException("permissions");
@@ -2430,7 +2461,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelId">the channel id</param>
         /// <param name="clientDatabaseId">the clients database id</param>
         /// <param name="permissionIdList">the permission ids</param>
-        public SimpleResponse DeleteChannelClientPermissions(uint channelId, uint clientDatabaseId, IEnumerable<uint> permissionIdList)
+        public SimpleResponse DeleteChannelClientPermissions(uint channelId, uint clientDatabaseId,
+            IEnumerable<uint> permissionIdList)
         {
             if (permissionIdList == null)
                 throw new ArgumentNullException("permissionIdList");
@@ -2458,9 +2490,10 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelId">the channel id</param>
         /// <param name="clientDatabaseId">the clients database id</param>
         /// <param name="permissionName">the permission name</param>
-        public SimpleResponse DeleteChannelClientPermission(uint channelId, uint clientDatabaseId, string permissionName)
+        public SimpleResponse DeleteChannelClientPermission(uint channelId, uint clientDatabaseId,
+            string permissionName)
         {
-            return DeleteChannelClientPermissions(channelId, clientDatabaseId, new[] { permissionName });
+            return DeleteChannelClientPermissions(channelId, clientDatabaseId, new[] {permissionName});
         }
 
         /// <summary>
@@ -2469,7 +2502,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelId">the channel id</param>
         /// <param name="clientDatabaseId">the clients database id</param>
         /// <param name="permissionIdList">the permission names</param>
-        public SimpleResponse DeleteChannelClientPermissions(uint channelId, uint clientDatabaseId, IEnumerable<string> permissionIdList)
+        public SimpleResponse DeleteChannelClientPermissions(uint channelId, uint clientDatabaseId,
+            IEnumerable<string> permissionIdList)
         {
             if (permissionIdList == null)
                 throw new ArgumentNullException("permissionIdList");
@@ -2524,7 +2558,8 @@ namespace TS3QueryLib.Core.Server
         /// </summary>
         public ListResponse<PermissionDetails> GetPermissionList()
         {
-            return ListResponse<PermissionDetails>.Parse(SendCommand(CommandName.PermissionList.CreateCommand()), PermissionDetails.Parse);
+            return ListResponse<PermissionDetails>.Parse(SendCommand(CommandName.PermissionList.CreateCommand()),
+                PermissionDetails.Parse);
         }
 
         /// <summary>
@@ -2533,7 +2568,7 @@ namespace TS3QueryLib.Core.Server
         /// <param name="permissionName">the permission name used for searching</param>
         public ListResponse<PermissionInfo> GetPermissionInfoByName(string permissionName)
         {
-            return GetPermissionInfoByNames(new[] { permissionName });
+            return GetPermissionInfoByNames(new[] {permissionName});
         }
 
         /// <summary>
@@ -2566,7 +2601,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelId">The channel id</param>
         /// <param name="clientDatabaseId">The client database id</param>
         /// <param name="permissionId">the permission id</param>
-        public ListResponse<PermissionOverviewEntry> GetPermissionOverview(uint channelId, uint clientDatabaseId, uint permissionId)
+        public ListResponse<PermissionOverviewEntry> GetPermissionOverview(uint channelId, uint clientDatabaseId,
+            uint permissionId)
         {
             Command command = CommandName.PermOverview.CreateCommand();
             command.AddParameter("cid", channelId);
@@ -2582,7 +2618,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelId">The channel id</param>
         /// <param name="clientDatabaseId">The client database id</param>
         /// <param name="permissionName">the permission name</param>
-        public ListResponse<PermissionOverviewEntry> GetPermissionOverview(uint channelId, uint clientDatabaseId, string permissionName)
+        public ListResponse<PermissionOverviewEntry> GetPermissionOverview(uint channelId, uint clientDatabaseId,
+            string permissionName)
         {
             Command command = CommandName.PermOverview.CreateCommand();
             command.AddParameter("cid", channelId);
@@ -2623,7 +2660,8 @@ namespace TS3QueryLib.Core.Server
         /// </summary>
         public SingleValueResponse<string> ResetPermissions()
         {
-            return ResponseBase<SingleValueResponse<string>>.Parse(SendCommand(CommandName.PermReset.CreateCommand()), "token");
+            return ResponseBase<SingleValueResponse<string>>.Parse(SendCommand(CommandName.PermReset.CreateCommand()),
+                "token");
         }
 
         /// <summary>
@@ -2641,7 +2679,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="isChannelGroupIdInsteadOfServerGroupId">if set to true, its a server group id</param>
         /// <param name="groupId">the id of the group</param>
         /// <param name="channelId">the id of the channel</param>
-        public SingleValueResponse<string> AddPrivilegeKey(bool isChannelGroupIdInsteadOfServerGroupId, uint groupId, uint channelId)
+        public SingleValueResponse<string> AddPrivilegeKey(bool isChannelGroupIdInsteadOfServerGroupId, uint groupId,
+            uint channelId)
         {
             return AddPrivilegeKey(isChannelGroupIdInsteadOfServerGroupId, groupId, channelId, (string) null);
         }
@@ -2654,9 +2693,11 @@ namespace TS3QueryLib.Core.Server
         /// <param name="groupId">the id of the group</param>
         /// <param name="channelId">the id of the channel</param>
         /// <param name="tokenDescription">the description for the token</param>
-        public SingleValueResponse<string> AddPrivilegeKey(bool isChannelGroupIdInsteadOfServerGroupId, uint groupId, uint channelId, string tokenDescription)
+        public SingleValueResponse<string> AddPrivilegeKey(bool isChannelGroupIdInsteadOfServerGroupId, uint groupId,
+            uint channelId, string tokenDescription)
         {
-            return AddPrivilegeKey(isChannelGroupIdInsteadOfServerGroupId, groupId, channelId, tokenDescription, (string) null);
+            return AddPrivilegeKey(isChannelGroupIdInsteadOfServerGroupId, groupId, channelId, tokenDescription,
+                (string) null);
         }
 
         /// <summary>
@@ -2667,7 +2708,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="groupId">the id of the group</param>
         /// <param name="channelId">the id of the channel</param>
         /// <param name="identValuePairs">The  parameter allows you to specify a set of custom client properties. This feature can be used when generating tokens to combine a website account database with a TeamSpeak user.</param>
-        public SingleValueResponse<string> AddPrivilegeKey(bool isChannelGroupIdInsteadOfServerGroupId, uint groupId, uint channelId, IEnumerable<KeyValuePair<string, string>> identValuePairs)
+        public SingleValueResponse<string> AddPrivilegeKey(bool isChannelGroupIdInsteadOfServerGroupId, uint groupId,
+            uint channelId, IEnumerable<KeyValuePair<string, string>> identValuePairs)
         {
             return AddPrivilegeKey(isChannelGroupIdInsteadOfServerGroupId, groupId, channelId, null, identValuePairs);
         }
@@ -2681,14 +2723,17 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelId">the id of the channel</param>
         /// <param name="tokenDescription">the description for the token</param>
         /// <param name="identValuePairs">The  parameter allows you to specify a set of custom client properties. This feature can be used when generating tokens to combine a website account database with a TeamSpeak user.</param>
-        public SingleValueResponse<string> AddPrivilegeKey(bool isChannelGroupIdInsteadOfServerGroupId, uint groupId, uint channelId, string tokenDescription, IEnumerable<KeyValuePair<string, string>> identValuePairs)
+        public SingleValueResponse<string> AddPrivilegeKey(bool isChannelGroupIdInsteadOfServerGroupId, uint groupId,
+            uint channelId, string tokenDescription, IEnumerable<KeyValuePair<string, string>> identValuePairs)
         {
-            string tokenCustomSettings = string.Join("|", identValuePairs.Select(ivp => string.Format("ident={0} value={1}", ivp.Key, ivp.Value)).ToArray());
+            string tokenCustomSettings = string.Join("|",
+                identValuePairs.Select(ivp => string.Format("ident={0} value={1}", ivp.Key, ivp.Value)).ToArray());
 
             if (tokenCustomSettings.IsNullOrTrimmedEmpty())
                 tokenCustomSettings = null;
 
-            return AddPrivilegeKey(isChannelGroupIdInsteadOfServerGroupId, groupId, channelId, tokenDescription, tokenCustomSettings);
+            return AddPrivilegeKey(isChannelGroupIdInsteadOfServerGroupId, groupId, channelId, tokenDescription,
+                tokenCustomSettings);
         }
 
         /// <summary>
@@ -2700,7 +2745,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelId">the id of the channel</param>
         /// <param name="tokenDescription">the description for the token</param>
         /// <param name="tokenCustomSettings">the custome settings you want to save with the token</param>
-        public SingleValueResponse<string> AddPrivilegeKey(bool isChannelGroupIdInsteadOfServerGroupId, uint groupId, uint channelId, string tokenDescription, string tokenCustomSettings)
+        public SingleValueResponse<string> AddPrivilegeKey(bool isChannelGroupIdInsteadOfServerGroupId, uint groupId,
+            uint channelId, string tokenDescription, string tokenCustomSettings)
         {
             Command command = CommandName.PrivilegeKeyAdd.CreateCommand();
             command.AddParameter("tokentype", isChannelGroupIdInsteadOfServerGroupId);
@@ -2919,7 +2965,8 @@ namespace TS3QueryLib.Core.Server
         /// </summary>
         public ListResponse<BanListEntry> GetBanList()
         {
-            return ListResponse<BanListEntry>.Parse(SendCommand(CommandName.BanList.CreateCommand()), BanListEntry.Parse);
+            return ListResponse<BanListEntry>.Parse(SendCommand(CommandName.BanList.CreateCommand()),
+                BanListEntry.Parse);
         }
 
         /// <summary>
@@ -2930,7 +2977,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="clientUniqueId">the clients unique id</param>
         /// <param name="duration">the duration</param>
         /// <param name="banReason">te reason for the ban</param>
-        public SingleValueResponse<uint?> AddBanRule(string ipPattern, string namePattern, string clientUniqueId, TimeSpan? duration, string banReason)
+        public SingleValueResponse<uint?> AddBanRule(string ipPattern, string namePattern, string clientUniqueId,
+            TimeSpan? duration, string banReason)
         {
             Command command = CommandName.BanAdd.CreateCommand();
 
@@ -2973,7 +3021,8 @@ namespace TS3QueryLib.Core.Server
             return ResponseBase<SimpleResponse>.Parse(SendCommand(CommandName.BanDelAll.CreateCommand()));
         }
 
-        public InitializeFileUploadResponse InitializeFileUpload(uint clientFileTransferId, string name, uint channelId, ulong size, bool overwrite, bool resume)
+        public InitializeFileUploadResponse InitializeFileUpload(uint clientFileTransferId, string name, uint channelId,
+            ulong size, bool overwrite, bool resume)
         {
             return InitializeFileUpload(clientFileTransferId, name, channelId, size, overwrite, resume, null);
         }
@@ -2989,7 +3038,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="overwrite">whether to overwrite an existing file</param>
         /// <param name="resume">whether to resume on an existing file</param>
         /// <param name="channelPassword">the optional channel password</param>
-        public InitializeFileUploadResponse InitializeFileUpload(uint clientFileTransferId, string name, uint channelId, ulong size, bool overwrite, bool resume, string channelPassword)
+        public InitializeFileUploadResponse InitializeFileUpload(uint clientFileTransferId, string name, uint channelId,
+            ulong size, bool overwrite, bool resume, string channelPassword)
         {
             Command command = CommandName.FtInitUpload.CreateCommand();
             command.AddParameter("clientftfid", clientFileTransferId);
@@ -3003,7 +3053,8 @@ namespace TS3QueryLib.Core.Server
             return ResponseBase<InitializeFileUploadResponse>.Parse(SendCommand(command));
         }
 
-        public InitializeFileDownloadResponse InitializeFileDownload(uint clientFileTransferId, string name, uint channelId, ulong seekPosition)
+        public InitializeFileDownloadResponse InitializeFileDownload(uint clientFileTransferId, string name,
+            uint channelId, ulong seekPosition)
         {
             return InitializeFileDownload(clientFileTransferId, name, channelId, seekPosition, null);
         }
@@ -3018,7 +3069,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelId">the id of the channel to upload the file to</param>
         /// <param name="seekPosition">the position of the file where to start downloading</param>
         /// <param name="channelPassword">the optional channel password</param>
-        public InitializeFileDownloadResponse InitializeFileDownload(uint clientFileTransferId, string name, uint channelId, ulong seekPosition, string channelPassword)
+        public InitializeFileDownloadResponse InitializeFileDownload(uint clientFileTransferId, string name,
+            uint channelId, ulong seekPosition, string channelPassword)
         {
             Command command = CommandName.FtInitDownload.CreateCommand();
             command.AddParameter("clientftfid", clientFileTransferId);
@@ -3037,7 +3089,8 @@ namespace TS3QueryLib.Core.Server
         /// </summary>
         public ListResponse<FileTransferListEntry> GetFileTransferList()
         {
-            return ListResponse<FileTransferListEntry>.Parse(SendCommand(CommandName.FtList.CreateCommand()), FileTransferListEntry.Parse);
+            return ListResponse<FileTransferListEntry>.Parse(SendCommand(CommandName.FtList.CreateCommand()),
+                FileTransferListEntry.Parse);
         }
 
         public ListResponse<FileTransferFileEntry> GetFileList(uint channelId, string filePath)
@@ -3091,7 +3144,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="channelId">the channel id</param>
         /// <param name="names">the names of the files</param>
         /// <param name="channelPassword">the channel password</param>
-        public ListResponse<FileTransferFileEntry> GetFileInfo(uint channelId, IEnumerable<string> names, string channelPassword)
+        public ListResponse<FileTransferFileEntry> GetFileInfo(uint channelId, IEnumerable<string> names,
+            string channelPassword)
         {
             if (names == null)
                 throw new ArgumentNullException("names");
@@ -3200,7 +3254,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="targetChannelId"></param>
         /// <param name="targetChannelPassword"></param>
         /// <returns></returns>
-        public SimpleResponse RenameFile(uint channelId, string oldName, string newName, uint? targetChannelId, string channelPassword, string targetChannelPassword)
+        public SimpleResponse RenameFile(uint channelId, string oldName, string newName, uint? targetChannelId,
+            string channelPassword, string targetChannelPassword)
         {
             if (oldName.IsNullOrTrimmedEmpty())
                 throw new ArgumentException("oldName is null or trimmed empty", "oldName");
@@ -3263,7 +3318,8 @@ namespace TS3QueryLib.Core.Server
         /// <param name="sourceGroupId">The id of the source group</param>
         /// <param name="targetGroupName">The name of the new group</param>
         /// <param name="groupType">The type of the group to create</param>
-        public SingleValueResponse<uint?> CopyServerGroup(uint sourceGroupId, string targetGroupName, GroupDatabaseType groupType)
+        public SingleValueResponse<uint?> CopyServerGroup(uint sourceGroupId, string targetGroupName,
+            GroupDatabaseType groupType)
         {
             Command command = CommandName.ServerGroupCopy.CreateCommand();
             command.AddParameter("ssgid", sourceGroupId);
@@ -3280,13 +3336,14 @@ namespace TS3QueryLib.Core.Server
         /// <param name="sourceGroupId">The id of the source group from which to copy settings</param>
         /// <param name="targetGroupId">The id of the group to overwrite</param>
         /// <param name="groupType">The type of the group to create</param>
-        public SingleValueResponse<uint?> OverwriteServerGroup(uint sourceGroupId, int targetGroupId, GroupDatabaseType groupType)
+        public SingleValueResponse<uint?> OverwriteServerGroup(uint sourceGroupId, int targetGroupId,
+            GroupDatabaseType groupType)
         {
             Command command = CommandName.ServerGroupCopy.CreateCommand();
             command.AddParameter("ssgid", sourceGroupId);
             command.AddParameter("tsgid", targetGroupId);
             command.AddParameter("name", "-");
-            command.AddParameter("type", (int)groupType);
+            command.AddParameter("type", (int) groupType);
 
             return ResponseBase<SingleValueResponse<uint?>>.Parse(SendCommand(command), "sgid");
         }
@@ -3297,13 +3354,14 @@ namespace TS3QueryLib.Core.Server
         /// <param name="sourceGroupId">The id of the source group</param>
         /// <param name="targetGroupName">The name of the new group</param>
         /// <param name="groupType">The type of the group to create</param>
-        public SingleValueResponse<uint?> CopyChannelGroup(uint sourceGroupId, string targetGroupName, GroupDatabaseType groupType)
+        public SingleValueResponse<uint?> CopyChannelGroup(uint sourceGroupId, string targetGroupName,
+            GroupDatabaseType groupType)
         {
             Command command = CommandName.ChannelGroupCopy.CreateCommand();
             command.AddParameter("scgid", sourceGroupId);
             command.AddParameter("tcgid", 0);
             command.AddParameter("name", targetGroupName);
-            command.AddParameter("type", (int)groupType);
+            command.AddParameter("type", (int) groupType);
 
             return ResponseBase<SingleValueResponse<uint?>>.Parse(SendCommand(command), "sgid");
         }
@@ -3314,19 +3372,18 @@ namespace TS3QueryLib.Core.Server
         /// <param name="sourceGroupId">The id of the source group from which to copy settings</param>
         /// <param name="targetGroupId">The id of the group to overwrite</param>
         /// <param name="groupType">The type of the group to create</param>
-        public SingleValueResponse<uint?> OverwriteChannelGroup(uint sourceGroupId, int targetGroupId, GroupDatabaseType groupType)
+        public SingleValueResponse<uint?> OverwriteChannelGroup(uint sourceGroupId, int targetGroupId,
+            GroupDatabaseType groupType)
         {
             Command command = CommandName.ChannelGroupCopy.CreateCommand();
             command.AddParameter("scgid", sourceGroupId);
             command.AddParameter("tcgid", targetGroupId);
             command.AddParameter("name", "-");
-            command.AddParameter("type", (int)groupType);
+            command.AddParameter("type", (int) groupType);
 
             return ResponseBase<SingleValueResponse<uint?>>.Parse(SendCommand(command), "cgid");
         }
 
         #endregion
-
-
     }
 }
