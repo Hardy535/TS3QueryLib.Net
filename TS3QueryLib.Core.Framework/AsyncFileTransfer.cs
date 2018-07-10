@@ -11,7 +11,10 @@ namespace TS3QueryLib.Core
     {
         #region Public Methods
 
-        public static void DownloadFile(string fileTransferKey, ulong size, string host, ushort filePort, string targetFileName, Action<string> connectedMethod, Action<string, Exception, SocketError?> errorMethod, Action<string, ulong, ulong> progressMethod, Action<string> finishedMethod, Func<string, bool> abortFunction)
+        public static void DownloadFile(string fileTransferKey, ulong size, string host, ushort filePort,
+            string targetFileName, Action<string> connectedMethod, Action<string, Exception, SocketError?> errorMethod,
+            Action<string, ulong, ulong> progressMethod, Action<string> finishedMethod,
+            Func<string, bool> abortFunction)
         {
             FileStream fileStream = File.Create(targetFileName);
 
@@ -47,29 +50,45 @@ namespace TS3QueryLib.Core
             );
         }
 
-        public static void DownloadFile(string fileTransferKey, ulong size, string host, ushort filePort, Stream downloadStream, Action<string> connectedMethod, Action<string, Exception, SocketError?> errorMethod, Action<string, ulong, ulong> progressMethod, Action<string> finishedMethod, Func<string, bool> abortFunction)
+        public static void DownloadFile(string fileTransferKey, ulong size, string host, ushort filePort,
+            Stream downloadStream, Action<string> connectedMethod, Action<string, Exception, SocketError?> errorMethod,
+            Action<string, ulong, ulong> progressMethod, Action<string> finishedMethod,
+            Func<string, bool> abortFunction)
         {
             Validate(fileTransferKey, host, filePort, downloadStream);
-            AsyncFileTranserHelper fileTransferHelper = new AsyncFileTranserHelper(host, filePort, fileTransferKey, size, downloadStream);
-            fileTransferHelper.DownloadFile(connectedMethod, errorMethod, progressMethod, finishedMethod, abortFunction);
+            AsyncFileTranserHelper fileTransferHelper =
+                new AsyncFileTranserHelper(host, filePort, fileTransferKey, size, downloadStream);
+            fileTransferHelper.DownloadFile(connectedMethod, errorMethod, progressMethod, finishedMethod,
+                abortFunction);
         }
 
-        public static void UploadFile(string fileTransferKey, string host, ushort filePort, string sourceFileName, Action<string> connectedMethod, Action<string, Exception, SocketError?> errorMethod, Action<string, ulong, ulong> progressMethod, Action<string> finishedMethod, Func<string, bool> abortFunction)
+        public static void UploadFile(string fileTransferKey, string host, ushort filePort, string sourceFileName,
+            Action<string> connectedMethod, Action<string, Exception, SocketError?> errorMethod,
+            Action<string, ulong, ulong> progressMethod, Action<string> finishedMethod,
+            Func<string, bool> abortFunction)
         {
             FileInfo fileInfo = new FileInfo(sourceFileName);
 
-            UploadFile(fileTransferKey, host, filePort, 0, (ulong)fileInfo.Length, sourceFileName, connectedMethod, errorMethod, progressMethod, finishedMethod, abortFunction);
+            UploadFile(fileTransferKey, host, filePort, 0, (ulong) fileInfo.Length, sourceFileName, connectedMethod,
+                errorMethod, progressMethod, finishedMethod, abortFunction);
         }
 
-        public static void UploadFile(string fileTransferKey, string host, ushort filePort, ulong numberOfBytesToSkip, string sourceFileName, Action<string> connectedMethod, Action<string, Exception, SocketError?> errorMethod, Action<string, ulong, ulong> progressMethod, Action<string> finishedMethod, Func<string, bool> abortFunction)
+        public static void UploadFile(string fileTransferKey, string host, ushort filePort, ulong numberOfBytesToSkip,
+            string sourceFileName, Action<string> connectedMethod, Action<string, Exception, SocketError?> errorMethod,
+            Action<string, ulong, ulong> progressMethod, Action<string> finishedMethod,
+            Func<string, bool> abortFunction)
         {
             FileInfo fileInfo = new FileInfo(sourceFileName);
-            ulong numberOfBytesToSend = (ulong)fileInfo.Length - numberOfBytesToSkip;
+            ulong numberOfBytesToSend = (ulong) fileInfo.Length - numberOfBytesToSkip;
 
-            UploadFile(fileTransferKey, host, filePort, numberOfBytesToSkip, numberOfBytesToSend, sourceFileName, connectedMethod, errorMethod, progressMethod, finishedMethod, abortFunction);
+            UploadFile(fileTransferKey, host, filePort, numberOfBytesToSkip, numberOfBytesToSend, sourceFileName,
+                connectedMethod, errorMethod, progressMethod, finishedMethod, abortFunction);
         }
 
-        public static void UploadFile(string fileTransferKey, string host, ushort filePort, ulong numberOfBytesToSkip, ulong numberOfBytesToSend, string sourceFileName, Action<string> connectedMethod, Action<string, Exception, SocketError?> errorMethod, Action<string, ulong, ulong> progressMethod, Action<string> finishedMethod, Func<string, bool> abortFunction)
+        public static void UploadFile(string fileTransferKey, string host, ushort filePort, ulong numberOfBytesToSkip,
+            ulong numberOfBytesToSend, string sourceFileName, Action<string> connectedMethod,
+            Action<string, Exception, SocketError?> errorMethod, Action<string, ulong, ulong> progressMethod,
+            Action<string> finishedMethod, Func<string, bool> abortFunction)
         {
             FileStream fileStream = File.OpenRead(sourceFileName);
 
@@ -105,14 +124,18 @@ namespace TS3QueryLib.Core
             );
         }
 
-        public static void UploadData(string fileTransferKey, string host, ushort filePort, ulong numberOfBytesToSkip, ulong numberOfBytesToSend, Stream sourceStream, Action<string> connectedMethod, Action<string, Exception, SocketError?> errorMethod, Action<string, ulong, ulong> progressMethod, Action<string> finishedMethod, Func<string, bool> abortFunction)
+        public static void UploadData(string fileTransferKey, string host, ushort filePort, ulong numberOfBytesToSkip,
+            ulong numberOfBytesToSend, Stream sourceStream, Action<string> connectedMethod,
+            Action<string, Exception, SocketError?> errorMethod, Action<string, ulong, ulong> progressMethod,
+            Action<string> finishedMethod, Func<string, bool> abortFunction)
         {
             Validate(fileTransferKey, host, filePort, sourceStream);
 
             if (numberOfBytesToSkip > 0)
                 sourceStream.Seek((long) numberOfBytesToSkip, SeekOrigin.Current);
 
-            AsyncFileTranserHelper fileTransferHelper = new AsyncFileTranserHelper(host, filePort, fileTransferKey, numberOfBytesToSend, sourceStream);
+            AsyncFileTranserHelper fileTransferHelper =
+                new AsyncFileTranserHelper(host, filePort, fileTransferKey, numberOfBytesToSend, sourceStream);
             fileTransferHelper.UploadFile(connectedMethod, errorMethod, progressMethod, finishedMethod, abortFunction);
         }
 
@@ -152,7 +175,8 @@ namespace TS3QueryLib.Core
 
             #region Constructor
 
-            public AsyncFileTranserHelper(string host, ushort port, string fileTransferKey, ulong size, Stream dataStream)
+            public AsyncFileTranserHelper(string host, ushort port, string fileTransferKey, ulong size,
+                Stream dataStream)
             {
                 if (dataStream == null)
                     throw new ArgumentNullException("dataStream");
@@ -171,17 +195,21 @@ namespace TS3QueryLib.Core
 
             #region Public Methods
 
-            public void DownloadFile(Action<string> connectedMethod, Action<string, Exception, SocketError?> errorMethod, Action<string, ulong, ulong> progressMethod, Action<string> finishedMethod, Func<string, bool> abortFunction)
+            public void DownloadFile(Action<string> connectedMethod,
+                Action<string, Exception, SocketError?> errorMethod, Action<string, ulong, ulong> progressMethod,
+                Action<string> finishedMethod, Func<string, bool> abortFunction)
             {
-                HandleFileTransfer(Download_Connected, connectedMethod, errorMethod, progressMethod, finishedMethod, abortFunction);
+                HandleFileTransfer(Download_Connected, connectedMethod, errorMethod, progressMethod, finishedMethod,
+                    abortFunction);
             }
 
 
-
-
-            public void UploadFile(Action<string> connectedMethod, Action<string, Exception, SocketError?> errorMethod, Action<string, ulong, ulong> progressMethod, Action<string> finishedMethod, Func<string, bool> abortFunction)
+            public void UploadFile(Action<string> connectedMethod, Action<string, Exception, SocketError?> errorMethod,
+                Action<string, ulong, ulong> progressMethod, Action<string> finishedMethod,
+                Func<string, bool> abortFunction)
             {
-                HandleFileTransfer(Upload_Connected, connectedMethod, errorMethod, progressMethod, finishedMethod, abortFunction);
+                HandleFileTransfer(Upload_Connected, connectedMethod, errorMethod, progressMethod, finishedMethod,
+                    abortFunction);
             }
 
             #endregion
@@ -197,11 +225,13 @@ namespace TS3QueryLib.Core
 
                 OnConnected();
 
-                SocketAsyncEventArgsUserToken userToken = (SocketAsyncEventArgsUserToken)socketAsyncEventArgs.UserToken;
+                SocketAsyncEventArgsUserToken
+                    userToken = (SocketAsyncEventArgsUserToken) socketAsyncEventArgs.UserToken;
                 byte[] messageBytes = Encoding.UTF8.GetBytes(FileTransferKey);
                 socketAsyncEventArgs.SetBuffer(messageBytes, 0, messageBytes.Length);
 
-                userToken.Socket.InvokeAsyncMethod(userToken.Socket.SendAsync, Download_FileTransferKeySent, socketAsyncEventArgs);
+                userToken.Socket.InvokeAsyncMethod(userToken.Socket.SendAsync, Download_FileTransferKeySent,
+                    socketAsyncEventArgs);
             }
 
             private void Download_FileTransferKeySent(object sender, SocketAsyncEventArgs socketAsyncEventArgs)
@@ -224,10 +254,12 @@ namespace TS3QueryLib.Core
                     return;
                 }
 
-                SocketAsyncEventArgsUserToken userToken = (SocketAsyncEventArgsUserToken)socketAsyncEventArgs.UserToken;
+                SocketAsyncEventArgsUserToken
+                    userToken = (SocketAsyncEventArgsUserToken) socketAsyncEventArgs.UserToken;
                 byte[] sizeBuffer = new byte[RECEIVE_BUFFER_SIZE];
                 socketAsyncEventArgs.SetBuffer(sizeBuffer, 0, sizeBuffer.Length);
-                userToken.Socket.InvokeAsyncMethod(userToken.Socket.ReceiveAsync, Download_FinishedReadingData, socketAsyncEventArgs);
+                userToken.Socket.InvokeAsyncMethod(userToken.Socket.ReceiveAsync, Download_FinishedReadingData,
+                    socketAsyncEventArgs);
             }
 
             private void Download_FinishedReadingData(object sender, SocketAsyncEventArgs socketAsyncEventArgs)
@@ -237,16 +269,18 @@ namespace TS3QueryLib.Core
                 if (!CheckOperationState(socketAsyncEventArgs))
                     return;
 
-                ulong bytesTransfered = (ulong)socketAsyncEventArgs.BytesTransferred;
+                ulong bytesTransfered = (ulong) socketAsyncEventArgs.BytesTransferred;
                 if (bytesTransfered != 0)
-                    DataStream.Write(socketAsyncEventArgs.Buffer, socketAsyncEventArgs.Offset, socketAsyncEventArgs.BytesTransferred);
+                    DataStream.Write(socketAsyncEventArgs.Buffer, socketAsyncEventArgs.Offset,
+                        socketAsyncEventArgs.BytesTransferred);
 
                 Processed += bytesTransfered;
                 OnProgress();
 
                 if (bytesTransfered == 0 && Processed < Size)
                 {
-                    OnError(new InvalidOperationException(string.Format("File download failed and was aborted after reading {0} of {1} bytes.", Processed, Size)));
+                    OnError(new InvalidOperationException(string.Format(
+                        "File download failed and was aborted after reading {0} of {1} bytes.", Processed, Size)));
                     return;
                 }
 
@@ -259,12 +293,13 @@ namespace TS3QueryLib.Core
                 Download_StartReadingData(socketAsyncEventArgs);
             }
 
-
             #endregion
 
             #region Upload Part
 
-            private void HandleFileTransfer(EventHandler<SocketAsyncEventArgs> callback, Action<string> connectedMethod, Action<string, Exception, SocketError?> errorMethod, Action<string, ulong, ulong> progressMethod, Action<string> finishedMethod, Func<string, bool> abortFunction)
+            private void HandleFileTransfer(EventHandler<SocketAsyncEventArgs> callback, Action<string> connectedMethod,
+                Action<string, Exception, SocketError?> errorMethod, Action<string, ulong, ulong> progressMethod,
+                Action<string> finishedMethod, Func<string, bool> abortFunction)
             {
                 ConnectedMethod = connectedMethod;
                 ErrorMethod = errorMethod;
@@ -272,8 +307,16 @@ namespace TS3QueryLib.Core
                 FinishedMethod = finishedMethod;
                 AbortFunction = abortFunction;
 
-                Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp) { ReceiveBufferSize = RECEIVE_BUFFER_SIZE, SendBufferSize = SEND_BUFFER_SIZE };
-                SocketAsyncEventArgs = new SocketAsyncEventArgs { RemoteEndPoint = ResolveEndpoint(Host, Port), UserToken = new SocketAsyncEventArgsUserToken { Socket = Socket } };
+                Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
+                {
+                    ReceiveBufferSize = RECEIVE_BUFFER_SIZE,
+                    SendBufferSize = SEND_BUFFER_SIZE
+                };
+                SocketAsyncEventArgs = new SocketAsyncEventArgs
+                {
+                    RemoteEndPoint = ResolveEndpoint(Host, Port),
+                    UserToken = new SocketAsyncEventArgsUserToken {Socket = Socket}
+                };
                 Socket.InvokeAsyncMethod(Socket.ConnectAsync, callback, SocketAsyncEventArgs);
             }
 
@@ -286,11 +329,13 @@ namespace TS3QueryLib.Core
 
                 OnConnected();
 
-                SocketAsyncEventArgsUserToken userToken = (SocketAsyncEventArgsUserToken)socketAsyncEventArgs.UserToken;
+                SocketAsyncEventArgsUserToken
+                    userToken = (SocketAsyncEventArgsUserToken) socketAsyncEventArgs.UserToken;
                 byte[] messageBytes = Encoding.UTF8.GetBytes(FileTransferKey);
                 socketAsyncEventArgs.SetBuffer(messageBytes, 0, messageBytes.Length);
 
-                userToken.Socket.InvokeAsyncMethod(userToken.Socket.SendAsync, Upload_FileTransferKeySent, socketAsyncEventArgs);
+                userToken.Socket.InvokeAsyncMethod(userToken.Socket.SendAsync, Upload_FileTransferKeySent,
+                    socketAsyncEventArgs);
             }
 
             private void Upload_FileTransferKeySent(object sender, SocketAsyncEventArgs socketAsyncEventArgs)
@@ -313,18 +358,21 @@ namespace TS3QueryLib.Core
                     return;
                 }
 
-                SocketAsyncEventArgsUserToken userToken = (SocketAsyncEventArgsUserToken)socketAsyncEventArgs.UserToken;
+                SocketAsyncEventArgsUserToken
+                    userToken = (SocketAsyncEventArgsUserToken) socketAsyncEventArgs.UserToken;
                 int bytesRead;
                 byte[] bytesToSend = ReadFromStream(DataStream, RECEIVE_BUFFER_SIZE, out bytesRead);
 
                 if (bytesRead == 0)
                 {
-                    OnError(new InvalidOperationException(string.Format("File upload failed and was aborted after sending {0} of {1} bytes.", Processed, Size)));
+                    OnError(new InvalidOperationException(string.Format(
+                        "File upload failed and was aborted after sending {0} of {1} bytes.", Processed, Size)));
                     return;
                 }
 
                 socketAsyncEventArgs.SetBuffer(bytesToSend, 0, bytesToSend.Length);
-                userToken.Socket.InvokeAsyncMethod(userToken.Socket.SendAsync, Upload_FinishedSendingData, socketAsyncEventArgs);
+                userToken.Socket.InvokeAsyncMethod(userToken.Socket.SendAsync, Upload_FinishedSendingData,
+                    socketAsyncEventArgs);
             }
 
             private void Upload_FinishedSendingData(object sender, SocketAsyncEventArgs socketAsyncEventArgs)
@@ -334,13 +382,14 @@ namespace TS3QueryLib.Core
                 if (!CheckOperationState(socketAsyncEventArgs))
                     return;
 
-                ulong bytesTransfered = (ulong)socketAsyncEventArgs.BytesTransferred;
+                ulong bytesTransfered = (ulong) socketAsyncEventArgs.BytesTransferred;
                 Processed += bytesTransfered;
                 OnProgress();
 
                 if (bytesTransfered == 0 && Processed < Size)
                 {
-                    OnError(new InvalidOperationException(string.Format("File upload failed and was aborted after sending {0} of {1} bytes.", Processed, Size)));
+                    OnError(new InvalidOperationException(string.Format(
+                        "File upload failed and was aborted after sending {0} of {1} bytes.", Processed, Size)));
                     return;
                 }
 
