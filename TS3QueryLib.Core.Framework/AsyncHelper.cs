@@ -6,7 +6,8 @@ namespace TS3QueryLib.Core
 {
     public static class AsyncHelper
     {
-        private static TaskFactory TaskFactory { get; } = new TaskFactory(CancellationToken.None, TaskCreationOptions.None, TaskContinuationOptions.None, TaskScheduler.Default);
+        private static TaskFactory TaskFactory { get; } = new TaskFactory(CancellationToken.None,
+            TaskCreationOptions.None, TaskContinuationOptions.None, TaskScheduler.Default);
 
         public static TResult RunSync<TResult>(Func<Task<TResult>> func)
         {
