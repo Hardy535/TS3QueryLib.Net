@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using TS3QueryLib.Core.Common;
 using System.Linq;
+using TS3QueryLib.Core.Common;
 using TS3QueryLib.Core.Server.Entities;
 using TS3QueryLib.Core.Server.Responses;
 
@@ -66,10 +66,12 @@ namespace TS3QueryLib.Core.Server
         /// </summary>
         /// <param name="channelListEntries">The list of channels from GetChannelList-Method</param>
         /// <param name="clientListEntries">The optional list of clients from GetClientList-Method</param>
-        public static List<ChannelTreeItem> GetChannelTree(IEnumerable<ChannelListEntry> channelListEntries, IEnumerable<ClientListEntry> clientListEntries)
+        public static List<ChannelTreeItem> GetChannelTree(IEnumerable<ChannelListEntry> channelListEntries,
+            IEnumerable<ClientListEntry> clientListEntries)
         {
             List<ChannelListEntry> allChannels = new List<ChannelListEntry>(channelListEntries);
-            List<ClientListEntry> allClients = new List<ClientListEntry>(clientListEntries ?? new ClientListEntry[] { });
+            List<ClientListEntry> allClients =
+                new List<ClientListEntry>(clientListEntries ?? new ClientListEntry[] { });
             List<ChannelTreeItem> result = new List<ChannelTreeItem>();
             AddChildren(null, result, allChannels, allClients);
 
@@ -106,17 +108,21 @@ namespace TS3QueryLib.Core.Server
         /// <param name="hashedUniqueClientId">The hashed unique id of the client which you can get by calling QueryRunner.GetClientInfo(..).HashedUniqueId</param>
         public static string GetAvatarFilename(string hashedUniqueClientId)
         {
-            return hashedUniqueClientId.IsNullOrTrimmedEmpty() ? null : string.Format("/avatar_{0}", hashedUniqueClientId);
+            return hashedUniqueClientId.IsNullOrTrimmedEmpty()
+                ? null
+                : string.Format("/avatar_{0}", hashedUniqueClientId);
         }
 
         #endregion
 
         #region Non Public Methods
 
-        private static void AddChildren(ChannelTreeItem parentChannelTreeItem, List<ChannelTreeItem> channelTree, List<ChannelListEntry> remainingChannels, List<ClientListEntry> remainingClients)
+        private static void AddChildren(ChannelTreeItem parentChannelTreeItem, List<ChannelTreeItem> channelTree,
+            List<ChannelListEntry> remainingChannels, List<ClientListEntry> remainingClients)
         {
             uint parentChannelId = parentChannelTreeItem == null ? 0 : parentChannelTreeItem.Channel.ChannelId;
-            List<ChannelTreeItem> targetChannelList = parentChannelTreeItem == null ? channelTree : parentChannelTreeItem.Children;
+            List<ChannelTreeItem> targetChannelList =
+                parentChannelTreeItem == null ? channelTree : parentChannelTreeItem.Children;
 
             List<ChannelListEntry> children = new List<ChannelListEntry>();
 
@@ -135,12 +141,14 @@ namespace TS3QueryLib.Core.Server
 
             foreach (ChannelListEntry channel in children)
             {
-                ChannelTreeItem channelTreeItem = new ChannelTreeItem(channel, parentChannelTreeItem == null ? null : parentChannelTreeItem.ParentChannel);
+                ChannelTreeItem channelTreeItem = new ChannelTreeItem(channel,
+                    parentChannelTreeItem == null ? null : parentChannelTreeItem.ParentChannel);
                 targetChannelList.Add(channelTreeItem);
 
                 if (remainingClients.Count > 0)
                 {
-                    List<ClientListEntry> clients = remainingClients.Where(c => c.ChannelId == channelTreeItem.Channel.ChannelId).ToList();
+                    List<ClientListEntry> clients = remainingClients
+                        .Where(c => c.ChannelId == channelTreeItem.Channel.ChannelId).ToList();
                     clients.Sort(SortUser);
                     channelTreeItem.Clients.AddRange(clients);
                 }
@@ -161,7 +169,7 @@ namespace TS3QueryLib.Core.Server
                 return;
 
             ChannelListEntry lastAddedChannelEntry = channelDict[0];
-            List<ChannelListEntry> temporaryChannels = new List<ChannelListEntry> { lastAddedChannelEntry };
+            List<ChannelListEntry> temporaryChannels = new List<ChannelListEntry> {lastAddedChannelEntry};
 
             do
             {
@@ -172,8 +180,7 @@ namespace TS3QueryLib.Core.Server
 
                 temporaryChannels.Add(nextSiblingChannelEntry);
                 lastAddedChannelEntry = nextSiblingChannelEntry;
-            }
-            while (true);
+            } while (true);
 
             if (temporaryChannels.Count != channels.Count)
                 return;
@@ -188,7 +195,7 @@ namespace TS3QueryLib.Core.Server
                 return client1.ClientType == 1 ? 1 : -1;
 
             if (client1.ClientTalkPower != client2.ClientTalkPower)
-                return (int)client2.ClientTalkPower - (int)client1.ClientTalkPower;
+                return (int) client2.ClientTalkPower - (int) client1.ClientTalkPower;
 
             if (client1.IsClientTalker != client2.IsClientTalker)
                 return client1.IsClientTalker.Value ? 1 : -1;
