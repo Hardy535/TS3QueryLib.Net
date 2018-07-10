@@ -34,10 +34,12 @@ namespace TS3QueryLib.Core
         /// Raised when the connection was reset by the server
         /// </summary>
         public event EventHandler ServerClosedConnection;
+
         /// <summary>
         /// Raised when an error was caused by the socket
         /// </summary>
         public event EventHandler<SocketErrorEventArgs> SocketError;
+
         /// <summary>
         /// Raised when the socket connected successfully and the greeting (TS3) was received.
         /// </summary>
@@ -74,7 +76,10 @@ namespace TS3QueryLib.Core
 
             _receiveRepository = new StringBuilder();
             _lastCommandResponse = null;
-            Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp) {ReceiveBufferSize = RECEIVE_BUFFER_SIZE};
+            Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
+            {
+                ReceiveBufferSize = RECEIVE_BUFFER_SIZE
+            };
 
             IPAddress ipV4;
 
@@ -96,7 +101,11 @@ namespace TS3QueryLib.Core
                 RemoteEndPoint = new IPEndPoint(ipV4, Port);
 
             _greetingReceived = false;
-            SocketAsyncEventArgs = new SocketAsyncEventArgs {RemoteEndPoint = RemoteEndPoint, UserToken = new SocketAsyncEventArgsUserToken {Socket = Socket}};
+            SocketAsyncEventArgs = new SocketAsyncEventArgs
+            {
+                RemoteEndPoint = RemoteEndPoint,
+                UserToken = new SocketAsyncEventArgsUserToken {Socket = Socket}
+            };
             Socket.InvokeAsyncMethod(Socket.ConnectAsync, Client_Connected, SocketAsyncEventArgs);
         }
 
@@ -131,7 +140,6 @@ namespace TS3QueryLib.Core
             }
             catch (ObjectDisposedException)
             {
-
             }
 
             return true;
@@ -148,6 +156,7 @@ namespace TS3QueryLib.Core
 
             base.DetachAllEventListeners();
         }
+
         #endregion
 
         #region Non Public Methods
@@ -158,12 +167,14 @@ namespace TS3QueryLib.Core
 
             EnsureSocketSuccess(socketAsyncEventArgs, () =>
             {
-                SocketAsyncEventArgsUserToken userToken = (SocketAsyncEventArgsUserToken)socketAsyncEventArgs.UserToken;
+                SocketAsyncEventArgsUserToken
+                    userToken = (SocketAsyncEventArgsUserToken) socketAsyncEventArgs.UserToken;
 
                 byte[] sizeBuffer = new byte[RECEIVE_BUFFER_SIZE];
                 socketAsyncEventArgs.SetBuffer(sizeBuffer, 0, sizeBuffer.Length);
 
-                userToken.Socket.InvokeAsyncMethod(userToken.Socket.ReceiveAsync, MessageReceived, socketAsyncEventArgs);
+                userToken.Socket.InvokeAsyncMethod(userToken.Socket.ReceiveAsync, MessageReceived,
+                    socketAsyncEventArgs);
             });
         }
 
@@ -171,12 +182,14 @@ namespace TS3QueryLib.Core
         {
             EnsureSocketSuccess(socketAsyncEventArgs, () =>
             {
-                SocketAsyncEventArgsUserToken userToken = (SocketAsyncEventArgsUserToken)socketAsyncEventArgs.UserToken;
+                SocketAsyncEventArgsUserToken
+                    userToken = (SocketAsyncEventArgsUserToken) socketAsyncEventArgs.UserToken;
 
                 byte[] sizeBuffer = new byte[RECEIVE_BUFFER_SIZE];
                 socketAsyncEventArgs.SetBuffer(sizeBuffer, 0, sizeBuffer.Length);
 
-                userToken.Socket.InvokeAsyncMethod(userToken.Socket.ReceiveAsync, MessageReceived, socketAsyncEventArgs);
+                userToken.Socket.InvokeAsyncMethod(userToken.Socket.ReceiveAsync, MessageReceived,
+                    socketAsyncEventArgs);
             });
         }
 
@@ -186,7 +199,8 @@ namespace TS3QueryLib.Core
 
             EnsureSocketSuccess(socketAsyncEventArgs, () =>
             {
-                string message = Encoding.UTF8.GetString(socketAsyncEventArgs.Buffer, socketAsyncEventArgs.Offset, socketAsyncEventArgs.BytesTransferred);
+                string message = Encoding.UTF8.GetString(socketAsyncEventArgs.Buffer, socketAsyncEventArgs.Offset,
+                    socketAsyncEventArgs.BytesTransferred);
 
                 if (message.Length == 0)
                 {
@@ -227,7 +241,7 @@ namespace TS3QueryLib.Core
                                 // extract the notification data and raise notification
                                 notifyMatch = GetNotifyResponseMatchBetweenCommandResponse(responseText);
                                 ThreadPool.QueueUserWorkItem(OnNotificationReceived, notifyMatch.Groups["event"].Value);
-                                
+
                                 // modify the response thext used for the command response
                                 responseText = notifyMatch.Groups["part1"].Value + notifyMatch.Groups["part2"].Value;
                             }
@@ -264,7 +278,9 @@ namespace TS3QueryLib.Core
 
                     if (queryType.HasValue)
                     {
-                        int requiredGreetingLength = queryType == QueryType.Client ? CLIENT_GREETING.Length : SERVER_GREETING.Length;
+                        int requiredGreetingLength = queryType == QueryType.Client
+                            ? CLIENT_GREETING.Length
+                            : SERVER_GREETING.Length;
 
                         if (greeting.Length >= requiredGreetingLength)
                         {
@@ -278,7 +294,8 @@ namespace TS3QueryLib.Core
                                     greetingCorrect = HandleServerQueryGreeting(greeting);
                                     break;
                                 default:
-                                    throw new InvalidOperationException("Forgott to implement query type: " + queryType);
+                                    throw new InvalidOperationException(
+                                        "Forgott to implement query type: " + queryType);
                             }
 
                             if (_greetingReceived && !greetingCorrect)
@@ -350,10 +367,13 @@ namespace TS3QueryLib.Core
 
         private static Match NotifyResponseMatch(string text)
         {
-            const string pattern = @"^notify.+?"+Ts3Util.QUERY_REGEX_LINE_BREAK;
+            const string pattern = @"^notify.+?" + Ts3Util.QUERY_REGEX_LINE_BREAK;
 
-            return text.StartsWith("notify", StringComparison.OrdinalIgnoreCase) ? Regex.Match(text, pattern, RegexOptions.Singleline) : Match.Empty;
+            return text.StartsWith("notify", StringComparison.OrdinalIgnoreCase)
+                ? Regex.Match(text, pattern, RegexOptions.Singleline)
+                : Match.Empty;
         }
+
         private static Match GetNotifyResponseMatchBetweenCommandResponse(string text)
         {
             const string PATTERN = @"^(?<part1>.*?\x0A\x0D)(?<event>notify.+?\x0A\x0D)(?<part2>.*)$";
@@ -363,22 +383,30 @@ namespace TS3QueryLib.Core
 
         protected static Match StatusLineMatch(string responseText)
         {
-            const string pattern = @"((^)|(.*?" + Ts3Util.QUERY_REGEX_LINE_BREAK + "))error id=.+?" + Ts3Util.QUERY_REGEX_LINE_BREAK;
+            const string pattern = @"((^)|(.*?" + Ts3Util.QUERY_REGEX_LINE_BREAK + "))error id=.+?" +
+                                   Ts3Util.QUERY_REGEX_LINE_BREAK;
 
-            return responseText.IndexOf("error id=", StringComparison.OrdinalIgnoreCase) != -1 ? Regex.Match(responseText, pattern, RegexOptions.Singleline) : Match.Empty;
+            return responseText.IndexOf("error id=", StringComparison.OrdinalIgnoreCase) != -1
+                ? Regex.Match(responseText, pattern, RegexOptions.Singleline)
+                : Match.Empty;
         }
 
         private void Send(string messageToSend)
         {
             lock (_sendMessageLockObject)
             {
-                using (SocketAsyncEventArgs socketAsyncEventArgs = new SocketAsyncEventArgs { RemoteEndPoint = RemoteEndPoint, UserToken = new SocketAsyncEventArgsUserToken { Socket = Socket } })
+                using (SocketAsyncEventArgs socketAsyncEventArgs = new SocketAsyncEventArgs
+                {
+                    RemoteEndPoint = RemoteEndPoint,
+                    UserToken = new SocketAsyncEventArgsUserToken {Socket = Socket}
+                })
                 {
                     byte[] messageBytes = Encoding.UTF8.GetBytes(messageToSend);
                     socketAsyncEventArgs.SetBuffer(messageBytes, 0, messageBytes.Length);
 
                     ManualResetEvent sendLock = new ManualResetEvent(false);
-                    EventHandler<SocketAsyncEventArgs> sendCallback = (sender, args) => EnsureSocketSuccess(args, () => sendLock.Set());
+                    EventHandler<SocketAsyncEventArgs> sendCallback = (sender, args) =>
+                        EnsureSocketSuccess(args, () => sendLock.Set());
 
                     if (Socket != null)
                     {
@@ -405,7 +433,7 @@ namespace TS3QueryLib.Core
                 case System.Net.Sockets.SocketError.Success:
                     action();
                     break;
-                    // more handling here later
+                // more handling here later
                 default:
                     OnSocketError(socketAsyncEventArgs.SocketError);
                     break;
@@ -448,7 +476,9 @@ namespace TS3QueryLib.Core
             SocketError socketError = (SocketError) state;
 
             if (SocketError != null)
-                SyncContext.PostEx(p => SocketError(((object[])p)[0], new SocketErrorEventArgs((SocketError)((object[])p)[1])), new object[] { this, socketError });
+                SyncContext.PostEx(
+                    p => SocketError(((object[]) p)[0], new SocketErrorEventArgs((SocketError) ((object[]) p)[1])),
+                    new object[] {this, socketError});
         }
 
         protected override void DisposeInternal()
@@ -473,8 +503,7 @@ namespace TS3QueryLib.Core
                     }
 
                     Thread.Sleep(10);
-                }
-                while (IsConnected);
+                } while (IsConnected);
 
                 return null;
             }
