@@ -12,7 +12,8 @@ namespace System
             return text == null || text.Trim().Length == 0;
         }
 
-        public static ReadOnlyDictionary<TKey, TValue> AsReadOnly<TKey, TValue>(this IDictionary<TKey, TValue> dictionary)
+        public static ReadOnlyDictionary<TKey, TValue> AsReadOnly<TKey, TValue>(
+            this IDictionary<TKey, TValue> dictionary)
         {
             return dictionary == null ? null : new ReadOnlyDictionary<TKey, TValue>(dictionary);
         }
@@ -64,7 +65,8 @@ namespace System
                 formatProvider = Thread.CurrentThread.CurrentCulture;
 
             Type targetType = typeof(T);
-            bool targetTypeIsNullableValueTyoe = targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Nullable<>);
+            bool targetTypeIsNullableValueTyoe =
+                targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Nullable<>);
 
             if (targetTypeIsNullableValueTyoe && sourceValue == null)
                 return defaultValue;
@@ -72,7 +74,7 @@ namespace System
             if (targetTypeIsNullableValueTyoe)
                 targetType = Nullable.GetUnderlyingType(targetType);
 
-            return (T)Convert.ChangeType(sourceValue, targetType, formatProvider);
+            return (T) Convert.ChangeType(sourceValue, targetType, formatProvider);
         }
 
         public static bool ToBool(this byte value)
@@ -101,7 +103,7 @@ namespace System
 
             if (!idString.IsNullOrTrimmedEmpty())
             {
-                string[] idArray = idString.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] idArray = idString.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (string singleIdString in idArray)
                 {
